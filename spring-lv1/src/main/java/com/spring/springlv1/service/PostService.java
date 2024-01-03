@@ -52,14 +52,13 @@ public class PostService {
     private boolean checkPassword(Long id, String password) {
         String checkPasswordSql = "SELECT post_password FROM POST WHERE post_id = ?";
         List<String> passwords = jdbcTemplate.query(checkPasswordSql, new Long[]{id}, (rs, rowNum) -> rs.getString(1));
-        return !passwords.isEmpty() && passwords.get(0).equals(password);
+        return passwords.isEmpty() || !passwords.get(0).equals(password);
     }
 
     private Long executeIfPasswordMatches(Long id, String password, Supplier<Long> action) {
         if (checkPassword(id, password)) {
-            return action.get();
-        } else {
             throw new IllegalArgumentException(POST_PASSWORD_ERROR_MESSAGE);
         }
+        return action.get();
     }
 }
